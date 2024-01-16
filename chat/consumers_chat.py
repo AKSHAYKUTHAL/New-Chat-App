@@ -1,5 +1,6 @@
 import json
 from channels.consumer import AsyncConsumer
+from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
 from django.contrib.auth import get_user_model
 from .models import Thread,ChatMessage,ThreadManager
@@ -13,11 +14,16 @@ class ChatConsumer(AsyncConsumer):
         print('connected', event)
         user = self.scope['user']
         chat_room = f'user_chatroom_{user.id}'
+
+        print(f"chat Room :{chat_room}")
+
         self.chat_room = chat_room
         await self.channel_layer.group_add(
             chat_room,
             self.channel_name
         )
+        print(f"channel_name {self.channel_name}")
+
         await self.send({
             'type': 'websocket.accept'
         })
@@ -47,6 +53,7 @@ class ChatConsumer(AsyncConsumer):
         await self.create_chat_message(thread_obj, sent_by_user, msg)
 
         other_user_chat_room = f'user_chatroom_{send_to_id}'
+        # print(f"other_user_chat_room  :  {other_user_chat_room}")
         self_user = self.scope['user']
         response = {
             'message': msg,
@@ -84,18 +91,18 @@ class ChatConsumer(AsyncConsumer):
 
     @database_sync_to_async
     def get_user_object(self, user_id):
-        qs = User.objects.filter(id=user_id)
-        if qs.exists():
-            obj = qs.first()
+        user = User.objects.filter(id=user_id)
+        if user.exists():
+            obj = user.first()
         else:
             obj = None
         return obj
 
     @database_sync_to_async
     def get_thread(self, thread_id):
-        qs = Thread.objects.filter(id=thread_id)
-        if qs.exists():
-            obj = qs.first()
+        thread = Thread.objects.filter(id=thread_id)
+        if thread.exists():
+            obj = thread.first()
         else:
             obj = None
         return obj

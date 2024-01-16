@@ -95,9 +95,6 @@ function newMessage(message, sent_by_id, thread_id) {
 
 
 $('.contact-li').on('click', function (){
-    $('.contacts .actiive').removeClass('active')
-    $(this).addClass('active')
-
     // message wrappers
     let chat_id = $(this).attr('chat-id')
     $('.messages-wrapper.is_active').removeClass('is_active')
@@ -116,6 +113,8 @@ function get_active_thread_id(){
     let thread_id = chat_id.replace('chat_', '')
     return thread_id
 }
+
+
 
 
 
