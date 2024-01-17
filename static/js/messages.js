@@ -35,6 +35,7 @@ socket.onopen = async function(e){
 
 socket.onmessage = async function(e){
     console.log('message', e)
+    console.log(e.data)
     let data = JSON.parse(e.data)
     let message = data['message']
     let sent_by_id = data['sent_by']
@@ -90,6 +91,7 @@ function newMessage(message, sent_by_id, thread_id) {
     message_body.animate({
         scrollTop: $(document).height()
     }, 100);
+    message_body.scrollTop(message_body[0].scrollHeight);
 	input_message.val(null);
 }
 
