@@ -268,3 +268,53 @@ html {
 
 
 
+
+.search-results {
+  position: absolute; 
+  top: 100%;
+  left: 0;
+  width: 100%; 
+  border: 1px solid #ddd; 
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); 
+  z-index: 1000; 
+  transition: all 0.3s ease; 
+  opacity: 0; 
+  visibility: hidden;
+  overflow-y: auto; 
+  max-height: 300px; 
+}
+
+
+.search-results .list-group {
+  margin: 0;
+  padding: 0;
+}
+
+
+.search-results .list-group-item {
+  padding: 10px 15px; 
+  cursor: pointer; 
+  border-bottom: 1px solid #eee;
+}
+
+
+.search-results .list-group-item:last-child {
+  border-bottom: none;
+}
+
+
+.search-results .list-group-item:hover {
+  background-color: #f8f8f8;
+}
+
+.search-results.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* .search-results-color {
+  background: linear-gradient(90deg, rgba(67,201,116,1) 0%, rgba(148,175,233,1) 100%);
+} */
+
+
+

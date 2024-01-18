@@ -3,8 +3,6 @@ from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from .models import Thread,User
-from django.urls import reverse
-
 
 
 

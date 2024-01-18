@@ -136,13 +136,15 @@ $(document).ready(function(){
                     // console.log("Received data:", data); 
                     let usersList = '<ul class="list-group">';
                     $.each(data, function(index, user){
-                        usersList += `<li class="list-group-item user-suggestion" data-user-id="${user.id}">${user.username}</li>`;
+                        usersList += `<li class="list-group-item user-suggestion " data-user-id="${user.id}">${user.username}</li>`;
                     });
                     usersList += '</ul>';
+                    $('.search-results').addClass('active');
                     $('.search-results').html(usersList);
                 }
             });
         } else {
+            $('.search-results').removeClass('active');
             $('.search-results').html('');
         }
     });
