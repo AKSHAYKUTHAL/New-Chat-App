@@ -3,6 +3,7 @@ let message_body = $('.msg_card_body')
 let send_message_form = $('#send-message-form')
 const USER_ID = $('#logged-in-user').val()
 
+
 let loc = window.location
 let wsStart = 'ws://' 
 
@@ -20,12 +21,14 @@ socket.onopen = async function(e){
         let message = input_message.val()
         let send_to = get_active_other_user_id()
         let thread_id = get_active_thread_id()
+        let unique_id = get_thread_unique_id(thread_id);
 
         let data = {
             'message': message,
             'sent_by': USER_ID,
             'send_to': send_to,
-            'thread_id': thread_id
+            'thread_id': thread_id,
+            'unique_id': unique_id 
         }
         data = JSON.stringify(data)
         socket.send(data)
@@ -36,11 +39,14 @@ socket.onopen = async function(e){
 socket.onmessage = async function(e){
     console.log('message', e)
     console.log(e.data)
+
     let data = JSON.parse(e.data)
+
     let message = data['message']
     let sent_by_id = data['sent_by']
     let thread_id = data['thread_id']
-    newMessage(message, sent_by_id, thread_id)
+    let unique_id = data['unique_id'];
+    newMessage(message, sent_by_id, thread_id, unique_id)
 }
 
 socket.onerror = async function(e){
@@ -52,7 +58,7 @@ socket.onclose = async function(e){
 }
 
 
-function newMessage(message, sent_by_id, thread_id) {
+function newMessage(message, sent_by_id, thread_id, unique_id) {
 	if ($.trim(message) === '') {
 		return false;
 	}
@@ -88,42 +94,91 @@ function newMessage(message, sent_by_id, thread_id) {
 
     let message_body = $('.messages-wrapper[chat-id="' + chat_id + '"] .msg_card_body')
 	message_body.append($(message_element))
-    message_body.animate({
-        scrollTop: $(document).height()
-    }, 100);
-    message_body.scrollTop(message_body[0].scrollHeight);
+    scrollToBottomOfActiveChat(true);
 	input_message.val(null);
 }
 
 
-$('.contact-li').on('click', function (){
-    // message wrappers
-    let chat_id = $(this).attr('chat-id')
-    $('.messages-wrapper.is_active').removeClass('is_active')
-    $('.messages-wrapper[chat-id="' + chat_id +'"]').addClass('is_active')
-
-})
 
 function get_active_other_user_id(){
-    let other_user_id = $('.messages-wrapper.is_active').attr('other-user-id')
+    let other_user_id = $('.messages-wrapper.is_active_message_body').attr('other-user-id')
     other_user_id = $.trim(other_user_id)
     return other_user_id
 }
 
 function get_active_thread_id(){
-    let chat_id = $('.messages-wrapper.is_active').attr('chat-id')
+    let chat_id = $('.messages-wrapper.is_active_message_body').attr('chat-id')
     let thread_id = chat_id.replace('chat_', '')
     return thread_id
 }
 
 
 
+function get_thread_unique_id(thread_id) {
+    let messageWrapper = document.querySelector(`.messages-wrapper[chat-id="chat_${thread_id}"]`);
+    if (messageWrapper) {
+        return messageWrapper.getAttribute('unique-id');
+    } else {
+        return null;
+    }
+}
 
 
 
-// auto suggestion of useers 
+
+function displayStartChattingMessage() {
+    $('#chat-container').hide(); 
+    $('#start-chatting-message').show();
+}
+
+function showChatInterface() {
+    $('#chat-container').show(); 
+    $('#start-chatting-message').hide(); 
+    $('#send-message-form').removeClass('hide');
+}
+
+
+
+
+$('.contact-li').on('click', function (){
+    // message wrappers
+    let chat_id = $(this).attr('chat-id')
+    
+    $('.messages-wrapper.is_active_message_body').removeClass('is_active_message_body')
+    $('.messages-wrapper[chat-id="' + chat_id +'"]').addClass('is_active_message_body')
+    scrollToBottomOfActiveChat(false);
+    showChatInterface();
+
+})
+
+
+
+// scroll to the botttom when selected a user chat
+function scrollToBottomOfActiveChat(animate = true) {
+    let activeMessageWrapper = $('.messages-wrapper.is_active_message_body .msg_card_body');
+    if (activeMessageWrapper.length > 0) {
+        setTimeout(() => {
+            if (animate) {
+                activeMessageWrapper.animate({
+                    scrollTop: activeMessageWrapper[0].scrollHeight
+                }, 500); // animated scrolling
+            } else {
+                activeMessageWrapper.scrollTop(activeMessageWrapper[0].scrollHeight); // instant scrolling without animation
+            }
+        }, 1); // Delay of 100 milliseconds
+    }
+}
+
+
+
+
 
 $(document).ready(function(){
+    displayStartChattingMessage();
+    scrollToBottomOfActiveChat(false);
+
+
+    // auto suggestion of useers 
     $('.search').keyup(function(){
         // console.log("Searching for:", $(this).val());
         let query = $(this).val();
@@ -150,7 +205,6 @@ $(document).ready(function(){
     });
 
         // csrf token retrieval function
-
         function getCookie(name) {
             let cookieValue = null;
             if (document.cookie && document.cookie !== '') {

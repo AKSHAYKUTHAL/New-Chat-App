@@ -18,6 +18,7 @@ def messages_page(request):
 
 
 
+
 @login_required
 def search_users(request):
     query = request.GET.get('query', '')
@@ -35,4 +36,4 @@ def create_thread(request):
         second_person=selected_user
     )
     chat_url = '/chat/'
-    return JsonResponse({'thread_id': thread.id, 'created': created, 'redirect_url': chat_url})
+    return JsonResponse({'thread_id': thread.id,'unique_id': str(thread.unique_id), 'created': created, 'redirect_url': chat_url})

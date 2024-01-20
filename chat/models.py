@@ -1,6 +1,8 @@
 from django.db import models
 from django.contrib.auth import get_user_model
 from django.db.models import Q
+import uuid
+
 
 User = get_user_model()
 
@@ -21,6 +23,9 @@ class Thread(models.Model):
     updated = models.DateTimeField(auto_now=True)
     timestamp = models.DateTimeField(auto_now_add=True)
 
+    unique_id = models.UUIDField(default=uuid.uuid4, unique=True,blank=True, null=True)
+
+
     objects = ThreadManager()
     class Meta:
         unique_together = ['first_person', 'second_person']
@@ -32,6 +37,7 @@ class ChatMessage(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     message = models.TextField()
     timestamp = models.DateTimeField(auto_now_add=True)
+    delivery_status = models.BooleanField(default=False)
 
     
     def __str__(self):
