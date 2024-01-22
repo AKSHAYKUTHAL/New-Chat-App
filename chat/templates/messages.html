@@ -24,10 +24,22 @@
                             <div class="input-group-prepend">
                                 <span class="input-group-text search_btn"><i class="fas fa-search"></i></span>
                             </div>
+                            <div class="input-group-prepend">
+                                <span class="btn btn-info border border-success rounded-circle ml-2" id="create-group-plus-"><i class="fas fa-plus" ></i></span>
+                            </div>
                             <div class="search-results"></div> <!-- Container for displaying search results -->
                         </div>
-                        
+                        <!-- Floating Group Creation Form -->
+                        <div id="group-creation-form" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 100; background: white; padding: 20px; border-radius: 10px;">
+                            <h3>Create New Group</h3>
+                            <input type="text" id="new-group-name" placeholder="Group Name" class="form-control">
+                            <button id="create-group-btn" class="btn btn-success mt-2">Create</button>
+                            <button id="cancel-group-btn" class="btn btn-danger mt-2">Cancel</button>
+                        </div>
 					</div>
+                    
+
+                    
 					<div class="card-body contacts_body">
 						<ui class="contacts">
                             {% for thread in Threads %}
@@ -157,9 +169,6 @@
 				// Add 'active' class to the clicked chat thread
 				clickedElement.classList.add('active');
 			}
-
-
-
            
             
 		</script>

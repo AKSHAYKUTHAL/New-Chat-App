@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
-from .models import Thread,User
+from .models import Thread,User,Group
 
 
 
@@ -37,3 +37,24 @@ def create_thread(request):
     )
     chat_url = '/chat/'
     return JsonResponse({'thread_id': thread.id,'unique_id': str(thread.unique_id), 'created': created, 'redirect_url': chat_url})
+
+
+
+
+
+# In your views.py
+
+@login_required
+def create_group(request):
+    if request.method == 'POST':
+        group_name = request.POST.get('group_name')
+        if group_name:
+            # Create the group and add the user
+            group = Group.objects.create(name=group_name)
+            group.members.add(request.user)
+
+            return JsonResponse({'group_id': group.id})
+        else:
+            return JsonResponse({'error': 'Invalid group name'}, status=400)
+    else:
+        return JsonResponse({'error': 'Invalid request'}, status=400)

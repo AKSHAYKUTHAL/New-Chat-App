@@ -170,7 +170,21 @@ function scrollToBottomOfActiveChat(animate = true) {
 }
 
 
-
+// csrf token retrieval function
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = jQuery.trim(cookies[i]);
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
 
 
 $(document).ready(function(){
@@ -203,22 +217,6 @@ $(document).ready(function(){
             $('.search-results').html('');
         }
     });
-
-        // csrf token retrieval function
-        function getCookie(name) {
-            let cookieValue = null;
-            if (document.cookie && document.cookie !== '') {
-                const cookies = document.cookie.split(';');
-                for (let i = 0; i < cookies.length; i++) {
-                    const cookie = jQuery.trim(cookies[i]);
-                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                        break;
-                    }
-                }
-            }
-            return cookieValue;
-        }
         
         const csrftoken = getCookie('csrftoken');
         
@@ -239,4 +237,46 @@ $(document).ready(function(){
                 }
             });
         });
+});
+
+
+
+
+// toggle create group
+$(document).ready(function() {
+    $('#create-group-plus-').click(function() {
+        $('#group-creation-form').show();
+    });
+
+    $('#cancel-group-btn').click(function() {
+        $('#group-creation-form').hide();
+    });
+});
+
+
+
+document.getElementById('create-group-btn').addEventListener('click', function() {
+    var groupName = document.getElementById('new-group-name').value;
+    const csrftoken = getCookie('csrftoken');
+    console.log(groupName)
+    if (groupName) {
+        // AJAX request to server to create group
+        $.ajax({
+            type: 'POST',
+            url: '/chat/create_group/',
+            data: {
+                'group_name': groupName,
+                'csrfmiddlewaretoken': csrftoken
+            },
+            success: function(response) {
+                // Handle success response
+                console.log("Group created with ID:", response.group_id);
+            },
+            error: function(error) {
+                // Handle error
+                console.log("Error creating group:", error);
+            }
+        });
+        document.getElementById('group-creation-form').style.display = 'none';
+    }
 });
