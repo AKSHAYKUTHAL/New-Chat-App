@@ -3,6 +3,10 @@ from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from .models import Thread,User,Group
+from itertools import chain
+from django.db.models import Value, BooleanField
+from django.forms.models import model_to_dict
+
 
 
 
@@ -10,8 +14,19 @@ from .models import Thread,User,Group
 @login_required
 def messages_page(request):
     threads = Thread.objects.by_user(user=request.user).prefetch_related('chatmessage_thread').order_by('timestamp')
+    groups = Group.objects.filter(members=request.user).prefetch_related('groupmessage_group').order_by('created_at')
+
+    threads = threads.annotate(is_thread=Value(True, output_field=BooleanField()))
+    groups = groups.annotate(is_group=Value(True, output_field=BooleanField()))
+
+# Combining threads and groups
+
+    threads_and_groups = list(chain(threads, groups))
+
     context = {
-        'Threads': threads
+        'threads': threads,
+        'groups':groups,
+        'threads_and_groups':threads_and_groups,
     }
     return render(request, 'messages.html',context)
 
@@ -52,9 +67,36 @@ def create_group(request):
             # Create the group and add the user
             group = Group.objects.create(name=group_name)
             group.members.add(request.user)
-
-            return JsonResponse({'group_id': group.id})
+            chat_url = '/chat/'
+            return JsonResponse({'group_id': group.id,'redirect_url': chat_url})
         else:
             return JsonResponse({'error': 'Invalid group name'}, status=400)
     else:
         return JsonResponse({'error': 'Invalid request'}, status=400)
+    
+
+
+
+@login_required
+def search_users_add_to_group(request, group_id):
+    query = request.GET.get('query', '')
+    group = Group.objects.get(id=group_id)
+
+    # group_data = model_to_dict(group, fields=['id', 'name', 'unique_id'])
+
+    users = User.objects.filter(username__icontains=query).exclude(id__in=group.members.all()).values('id', 'username')
+    return JsonResponse(list(users) ,safe=False)
+
+
+@login_required
+def add_to_group(request):
+    selected_user_id = request.POST.get('selected_user_id')
+    selected_group_id = request.POST.get('selectedGroupId')
+
+    group = Group.objects.get(id=selected_group_id)
+    user = User.objects.get(id=selected_user_id)
+
+    group.members.add(user)
+
+    chat_url = '/chat/'
+    return JsonResponse({'redirect_url': chat_url})

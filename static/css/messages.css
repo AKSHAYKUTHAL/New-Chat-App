@@ -339,5 +339,63 @@ html {
   border-radius: 10px; /* Rounded corners */
 }
 
+.search-results-add-to-group {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  border: 1px solid #ddd;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+  transition: all 0.3s ease;
+  opacity: 0;
+  visibility: hidden;
+  overflow-y: auto;
+  max-height: 300px;
+}
 
+.search-results-add-to-group .list-group {
+  margin: 0;
+  padding: 0;
+}
+
+.search-results-add-to-group .list-group-item {
+  padding: 10px 15px;
+  cursor: pointer;
+  border-bottom: 1px solid #eee;
+}
+
+.search-results-add-to-group .list-group-item:last-child {
+  border-bottom: none;
+}
+
+.search-results-add-to-group .list-group-item:hover {
+  background-color: #f8f8f8;
+}
+
+.search-results-add-to-group.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+
+.replied .message-container {
+  align-items: flex-end; 
+  display: flex;
+  flex-direction: column;
+  text-align: right; 
+}
+
+.username-replied {
+  color: white;
+  font-weight: bold;
+  font-size: small;
+  margin-bottom: 5px;
+}
+
+.username-received {
+  color: white;
+  font-weight: bold;
+  font-size: small;
+}
 

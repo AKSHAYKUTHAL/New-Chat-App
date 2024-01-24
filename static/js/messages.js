@@ -19,15 +19,13 @@ socket.onopen = async function(e){
     send_message_form.on('submit', function (e){
         e.preventDefault()
         let message = input_message.val()
-        let send_to = get_active_other_user_id()
-        let thread_id = get_active_thread_id()
-        let unique_id = get_thread_unique_id(thread_id);
+        let thread_or_group_id = get_active_thread_or_group_id()
+        let unique_id = get_thread_or_group_unique_id(thread_or_group_id);
 
         let data = {
             'message': message,
             'sent_by': USER_ID,
-            'send_to': send_to,
-            'thread_id': thread_id,
+            'thread_or_group_id': thread_or_group_id,
             'unique_id': unique_id 
         }
         data = JSON.stringify(data)
@@ -44,9 +42,11 @@ socket.onmessage = async function(e){
 
     let message = data['message']
     let sent_by_id = data['sent_by']
-    let thread_id = data['thread_id']
+    let thread_or_group_id = data['thread_or_group_id']
     let unique_id = data['unique_id'];
-    newMessage(message, sent_by_id, thread_id, unique_id)
+    let sent_by_username = data['sent_by_username']
+    let timestamp = data['timestamp']
+    newMessage(message, sent_by_id, thread_or_group_id, unique_id,sent_by_username,timestamp)
 }
 
 socket.onerror = async function(e){
@@ -58,36 +58,42 @@ socket.onclose = async function(e){
 }
 
 
-function newMessage(message, sent_by_id, thread_id, unique_id) {
+function newMessage(message, sent_by_id, thread_or_group_id, unique_id,sent_by_username,timestamp ) {
 	if ($.trim(message) === '') {
 		return false;
 	}
 	let message_element;
-	let chat_id = 'chat_' + thread_id
+	let chat_id = 'chat_' + thread_or_group_id
 	if(sent_by_id == USER_ID){
 	    message_element = `
-			<div class="d-flex mb-4 replied">
-				<div class="msg_cotainer_send">
-					${message}
-					<span class="msg_time_send">8:55 AM, Today</span>
-				</div>
-				<div class="img_cont_msg">
-					<img src="">
-				</div>
-			</div>
+        <div class="d-flex mb-4 replied">
+            <div class="message-container">
+                <div class="username-replied">
+                    ${sent_by_username}
+                </div>
+                <div class="msg_cotainer_send">
+                ${message}
+                    <span class="msg_time_send">${timestamp}</span>
+                </div>
+            </div>
+        </div>
 	    `
     }
 	else{
 	    message_element = `
-           <div class="d-flex mb-4 received">
-              <div class="img_cont_msg">
-                 <img src="https://static.turbosquid.com/Preview/001292/481/WV/_D.jpg" class="rounded-circle user_img_msg">
-              </div>
-              <div class="msg_cotainer">
-                 ${message}
-              <span class="msg_time">8:40 AM, Today</span>
-              </div>
-           </div>
+        <div class="d-flex mb-4 received">
+        <div class="message-block">
+            <div class="username-received" >
+                ${sent_by_username}
+            </div>
+            <div class="msg_cotainer">
+                <div>
+                ${message}
+                    <span class="msg_time">${timestamp}</span>
+                </div>
+            </div>
+        </div>
+    </div>
         `
 
     }
@@ -100,22 +106,22 @@ function newMessage(message, sent_by_id, thread_id, unique_id) {
 
 
 
-function get_active_other_user_id(){
-    let other_user_id = $('.messages-wrapper.is_active_message_body').attr('other-user-id')
-    other_user_id = $.trim(other_user_id)
-    return other_user_id
-}
+// function get_active_other_user_id(){
+//     let other_user_id = $('.messages-wrapper.is_active_message_body').attr('other-user-id')
+//     other_user_id = $.trim(other_user_id)
+//     return other_user_id
+// }
 
-function get_active_thread_id(){
+function get_active_thread_or_group_id(){
     let chat_id = $('.messages-wrapper.is_active_message_body').attr('chat-id')
-    let thread_id = chat_id.replace('chat_', '')
-    return thread_id
+    let thread_or_group = chat_id.replace('chat_', '')
+    return thread_or_group
 }
 
 
 
-function get_thread_unique_id(thread_id) {
-    let messageWrapper = document.querySelector(`.messages-wrapper[chat-id="chat_${thread_id}"]`);
+function get_thread_or_group_unique_id(thread_or_group_id) {
+    let messageWrapper = document.querySelector(`.messages-wrapper[chat-id="chat_${thread_or_group_id}"]`);
     if (messageWrapper) {
         return messageWrapper.getAttribute('unique-id');
     } else {
@@ -237,7 +243,59 @@ $(document).ready(function(){
                 }
             });
         });
+
+
+        ///////////////////////////////////////////////////////////
+        // auto suggestion to add group members to the group 
+    $('.search-add-group-members').keyup(function(){
+        let query = $(this).val();
+        let group_id = $(this).attr('group-id');
+        console.log(group_id)
+        if (query != '') {
+            $.ajax({
+                url: `/chat/search_users_add_to_group/${group_id}/`,
+                method: "GET",
+                data: {query: query},
+                success: function(data) {
+                    // console.log("Received data:", data); 
+                    let usersList = '<ul class="list-group">';
+                    $.each(data, function(index, user){
+                        usersList += `<li class="list-group-item user-suggestion-add-to-group" data-user-id="${user.id}" data-group-id="${group_id}">${user.username}</li>`;
+                    });
+                    usersList += '</ul>';
+                    $('.search-results-add-to-group').addClass('active');
+                    $('.search-results-add-to-group').html(usersList);
+                }
+            });
+        } else {
+            $('.search-results-add-to-group').removeClass('active');
+            $('.search-results-add-to-group').html('');
+        }
+    });
+                
+        $(document).on('click', '.user-suggestion-add-to-group', function(){
+            let selectedUserId = $(this).data('user-id');
+            let selectedGroupId = $(this).data('group-id')
+            $.ajax({
+                url: "/chat/add_to_group/",
+                method: "POST",
+                data: {
+                    'selected_user_id': selectedUserId,
+                    'csrfmiddlewaretoken': csrftoken,
+                    'selectedGroupId':selectedGroupId,
+                },
+                success: function(response) {
+                    console.log('Member added with');
+                    if(response.redirect_url) {
+                        window.location.href = response.redirect_url;
+                    }
+                }
+            });
+        });
 });
+
+
+
 
 
 
@@ -271,6 +329,9 @@ document.getElementById('create-group-btn').addEventListener('click', function()
             success: function(response) {
                 // Handle success response
                 console.log("Group created with ID:", response.group_id);
+                if(response.redirect_url) {
+                    window.location.href = response.redirect_url;
+                }
             },
             error: function(error) {
                 // Handle error

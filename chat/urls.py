@@ -8,6 +8,8 @@ urlpatterns = [
     path('search_users/', views.search_users, name='search_users'),
     path('create_thread/', views.create_thread, name='create_thread'),
     path('create_group/', views.create_group, name='create_group'),
+    path('search_users_add_to_group/<int:group_id>/', views.search_users_add_to_group, name='search_users_add_to_group'),
+    path('add_to_group/',views.add_to_group,name='add_to_group'),
 ]
 
 
