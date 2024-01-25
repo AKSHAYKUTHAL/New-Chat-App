@@ -43,7 +43,7 @@
 					<div class="card-body contacts_body">
 						<ui class="contacts">
                             {% for item in threads_and_groups %}
-							    <li onclick="setActiveChat(this)" class=" contact-li" chat-id="chat_{{ item.id }}" style="cursor: pointer">
+							    <li onclick="setActiveChat(this)" class=" contact-li" chat-id="chat_{{ item.id }}" data-thread-id="{{ item.id }}" style="cursor: pointer">
                                     <div class="d-flex bd-highlight">
                                         <div class="img_cont">
                                             <img src="https://static.turbosquid.com/Preview/001292/481/WV/_D.jpg" class="rounded-circle user_img">
@@ -217,19 +217,5 @@
         <script src="{% static 'js/messages.js' %}"></script>
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-
-		<script>
-			function setActiveChat(clickedElement) {
-				// Remove 'active' class from all chat threads
-				document.querySelectorAll('.contact-li').forEach(function(chatElement) {
-					chatElement.classList.remove('active');
-				});
-		
-				// Add 'active' class to the clicked chat thread
-				clickedElement.classList.add('active');
-			}
-           
-            
-		</script>
 
 {% endblock %}
