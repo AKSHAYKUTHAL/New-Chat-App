@@ -138,22 +138,20 @@
                                 {% for chat in item.chatmessage_thread.all %}
                                     {% if chat.user == user %}
                                         <div class="d-flex mb-4 replied">
-                                            <div class="msg_cotainer_send">
-                                                {{ chat.message }}
-                                                <span class="msg_time_send">{{ chat.timestamp|date:"d D" }}, {{ chat.timestamp|time:"H:i" }}</span>
-                                            </div>
-                                            <div class="img_cont_msg">
-                                                <img src="" class="rounded-circle user_img_msg">
+                                            <div class="message-container">
+                                                <div class="msg_cotainer_send">
+                                                    {{ chat.message }}
+                                                    <span class="msg_time_send">{{ chat.timestamp|date:"d D" }}, {{ chat.timestamp|time:"H:i" }}</span>
+                                                </div>
                                             </div>
                                         </div>
                                         {% else %}
                                         <div class="d-flex mb-4 received">
-                                            <div class="img_cont_msg">
-                                                <img src="https://static.turbosquid.com/Preview/001292/481/WV/_D.jpg" class="rounded-circle user_img_msg">
-                                            </div>
                                             <div class="msg_cotainer">
-                                                {{ chat.message }}
-                                                <span class="msg_time">{{ chat.timestamp|date:"d D" }}, {{ chat.timestamp|time:"H:i" }}</span>
+                                                <div>
+                                                    {{ chat.message }}
+                                                    <span class="msg_time">{{ chat.timestamp|date:"d D" }}, {{ chat.timestamp|time:"H:i" }}</span>
+                                                </div>
                                             </div>
                                         </div>
                                     {% endif %}
