@@ -43,9 +43,9 @@
 					<div class="card-body contacts_body">
 						<ui class="contacts">
                             {% for item in threads_and_groups %}
-							    <li onclick="setActiveChat(this)" class=" contact-li" chat-id="chat_{{ item.id }}" data-thread-id="{{ item.id }}" style="cursor: pointer">
+							    <li onclick="setActiveChat(this)" class=" contact-li" chat-id="chat_{{ item.unique_id }}" data-thread-id="{{ item.unique_id }}" style="cursor: pointer">
                                     <div class="d-flex bd-highlight">
-                                        <div class="img_cont">
+                                        <div class="img_cont"> 
                                             <img src="https://static.turbosquid.com/Preview/001292/481/WV/_D.jpg" class="rounded-circle user_img">
                                             <span class="online_icon"></span>
                                         </div>
@@ -74,7 +74,7 @@
                 </div>
 				<div class="card" id="chat-container" style="display: none;">
                 {% for item in threads_and_groups %}
-                    <div class="messages-wrapper  {% if forloop.first %}hide {% else %}hide{% endif %}" chat-id="chat_{{ item.id }}" unique-id="{{item.unique_id}}" >
+                    <div class="messages-wrapper  hide" chat-id="chat_{{ item.unique_id }}" unique-id="{{item.unique_id}}" >
                         <div class="card-header msg_head">
                             <div class="d-flex bd-highlight">
                                 <div class="img_cont">
@@ -117,7 +117,7 @@
 
                                     {% if item.is_group %}
                                     <div class="input-group ml-2" style="width: auto;">
-                                        <input type="text" placeholder="Search..." name="" class="form-control search-add-group-members" group-id = "{{item.id}}">
+                                        <input type="text" placeholder="Search..." name="" class="form-control search-add-group-members" group-id = "{{item.unique_id}}">
                                         <div class="input-group-prepend">
                                             <span class="input-group-text search_btn"><i class="fas fa-search"></i></span>
                                         </div>
@@ -216,6 +216,18 @@
 
         <script src="{% static 'js/messages.js' %}"></script>
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
+        <script>
+			function setActiveChat(clickedElement) {
+				document.querySelectorAll('.contact-li').forEach(function(chatElement) {
+					chatElement.classList.remove('active');
+				});
+				clickedElement.classList.add('active');
+			}
+
+
+		</script>
 
 
 {% endblock %}

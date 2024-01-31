@@ -51,7 +51,7 @@ def create_thread(request):
         second_person=selected_user
     )
     chat_url = '/chat/'
-    return JsonResponse({'thread_id': thread.id,'unique_id': str(thread.unique_id), 'created': created, 'redirect_url': chat_url})
+    return JsonResponse({'unique_id': str(thread.unique_id), 'created': created, 'redirect_url': chat_url})
 
 
 
@@ -68,7 +68,7 @@ def create_group(request):
             group = Group.objects.create(name=group_name)
             group.members.add(request.user)
             chat_url = '/chat/'
-            return JsonResponse({'group_id': group.id,'redirect_url': chat_url})
+            return JsonResponse({'group_unique_id': group.unique_id,'redirect_url': chat_url})
         else:
             return JsonResponse({'error': 'Invalid group name'}, status=400)
     else:
@@ -78,9 +78,9 @@ def create_group(request):
 
 
 @login_required
-def search_users_add_to_group(request, group_id):
+def search_users_add_to_group(request, group_unique_id):
     query = request.GET.get('query', '')
-    group = Group.objects.get(id=group_id)
+    group = Group.objects.get(unique_id=group_unique_id)
 
     # group_data = model_to_dict(group, fields=['id', 'name', 'unique_id'])
 
@@ -91,9 +91,9 @@ def search_users_add_to_group(request, group_id):
 @login_required
 def add_to_group(request):
     selected_user_id = request.POST.get('selected_user_id')
-    selected_group_id = request.POST.get('selectedGroupId')
+    selected_group_unique_id = request.POST.get('selected_group_unique_id')
 
-    group = Group.objects.get(id=selected_group_id)
+    group = Group.objects.get(unique_id=selected_group_unique_id)
     user = User.objects.get(id=selected_user_id)
 
     group.members.add(user)

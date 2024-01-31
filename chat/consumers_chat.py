@@ -42,7 +42,7 @@ class ChatConsumer(AsyncConsumer):
         print(received_data)
         msg = received_data.get('message')
         sent_by_id = received_data.get('sent_by')
-        thread_or_group_id = received_data.get('thread_or_group_id')
+        # thread_or_group_id = received_data.get('thread_or_group_id')
         unique_id = received_data.get('unique_id')
 
         if not msg:
@@ -60,7 +60,7 @@ class ChatConsumer(AsyncConsumer):
         sent_by_user = await self.get_user_object(sent_by_id)
         sent_by_username = sent_by_user.username
         print(f"{sent_by_username}")
-        thread_or_group_obj = await self.get_thread_or_group(thread_or_group_id)
+        thread_or_group_obj = await self.get_thread_or_group(unique_id)
 
         if not sent_by_user:
             print('Error:: sent by user is incorrect')
@@ -77,7 +77,7 @@ class ChatConsumer(AsyncConsumer):
         response = {
             'message': msg,
             'sent_by': self_user.id,
-            'thread_or_group_id': thread_or_group_id,
+            # 'thread_or_group_id': thread_or_group_id,
             'unique_id': unique_id,
             'sent_by_username':sent_by_username,
             'timestamp': formatted_timestamp,
@@ -112,12 +112,12 @@ class ChatConsumer(AsyncConsumer):
         return User.objects.filter(id=user_id).first()
 
     @database_sync_to_async
-    def get_thread_or_group(self, thread_or_group_id):
-        thread = Thread.objects.filter(id=thread_or_group_id).first()
+    def get_thread_or_group(self, unique_id):
+        thread = Thread.objects.filter(unique_id=unique_id).first()
         if thread:
             return thread
         else:
-            return Group.objects.filter(id=thread_or_group_id).first()
+            return Group.objects.filter(unique_id=unique_id).first()
 
 
     @database_sync_to_async
