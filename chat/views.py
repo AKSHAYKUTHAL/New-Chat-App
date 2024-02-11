@@ -1,14 +1,14 @@
 from django.shortcuts import render
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
-from .models import Thread,User,Group
+from .models import Thread,Group
 from itertools import chain
 from django.db.models import Value, BooleanField
 from django.forms.models import model_to_dict
 
 
-
+User = get_user_model()
 
 
 @login_required
