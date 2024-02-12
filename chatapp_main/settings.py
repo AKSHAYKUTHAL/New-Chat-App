@@ -158,5 +158,5 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'akshaykuthal99@gmail.com'
-EMAIL_HOST_PASSWORD = 'otjdvscdrthcnfdf'
+EMAIL_HOST_PASSWORD = 'orhnhphyfvspputl'
 DEFAULT_FROM_EMAIL = 'Dchat <akshaykuthal99@gmail.com>'

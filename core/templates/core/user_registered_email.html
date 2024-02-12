@@ -1,0 +1,14 @@
+{% autoescape off %}
+
+Hi {{user.first_name}},
+
+{% if is_registered %}
+Congratulations! Your account has been registered with --D-Chat
+{% endif %}
+
+<h3> Username :<p> {{temp_username}} </p></h3>
+<h3> Password :<p> {{temp_password}} </p></h3>
+
+
+
+{% endautoescape %}

@@ -399,3 +399,19 @@ html {
   font-size: small;
 }
 
+
+
+.show-notification{
+  position: fixed;
+  bottom: 100%;
+  right: 20px;
+  animation-name: show-toast;
+  animation-duration: 8s;
+  z-index: 99;
+}
+
+@keyframes show-toast {
+  0% { bottom: -100px; opacity: 0; }
+  10%, 90% { bottom: 20px; opacity: 1; }
+  100% { bottom: -100px; opacity: 0; }
+}

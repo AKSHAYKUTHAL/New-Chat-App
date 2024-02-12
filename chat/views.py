@@ -28,7 +28,7 @@ def messages_page(request):
         'groups':groups,
         'threads_and_groups':threads_and_groups,
     }
-    return render(request, 'messages.html',context)
+    return render(request, 'chat/messages.html',context)
 
 
 
