@@ -40,12 +40,21 @@ socket.onmessage = async function(e){
 
     let message = data['message']
     let sent_by_id = data['sent_by']
-    // let thread_or_group_id = data['thread_or_group_id']
     let unique_id = data['unique_id'];
     let sent_by_username = data['sent_by_username']
     let timestamp = data['timestamp']
-    newMessage(message, sent_by_id, unique_id,sent_by_username,timestamp)
-}
+
+    if ($('.messages-wrapper.is_active_message_body').attr('chat-id') === 'chat_' + unique_id) {
+        newMessage(message, sent_by_id, unique_id, sent_by_username, timestamp);
+        // markMessagesAsReadWhenAlreadyInChat(unique_id);
+    } else {
+        // Update notification for other chats
+        let unreadCountElement = $('.contact-li[chat-id="chat_' + unique_id + '"] .unread-messages-count');
+        let currentCount = parseInt(unreadCountElement.text()) || 0;
+        unreadCountElement.text(currentCount + 1).show();
+        newMessage(message, sent_by_id, unique_id, sent_by_username, timestamp);
+    }
+};
 
 socket.onerror = async function(e){
     console.log('error', e)
@@ -142,16 +151,48 @@ function showChatInterface() {
 
 $('.contact-li').on('click', function (){
     // message wrappers
-    let chat_id = $(this).attr('chat-id')
+    let chat_id = $(this).attr('chat-id');
+    let uniqueId = $(this).data('thread-id')
     
     $('.messages-wrapper.is_active_message_body').removeClass('is_active_message_body')
     $('.messages-wrapper[chat-id="' + chat_id +'"]').addClass('is_active_message_body')
     scrollToBottomOfActiveChat(false);
     showChatInterface();
+    markMessagesAsRead(uniqueId);
 
 })
 
+function markMessagesAsRead(unique_id) {
+    $.ajax({
+        url: '/chat/mark_messages_as_read/', 
+        method: 'POST',
+        data: {
+            'unique_id': unique_id,
+            'csrfmiddlewaretoken': getCookie('csrftoken')
+        },
+        success: function(response) {
+            $('.contact-li[chat-id="chat_' + unique_id + '"] .unread-messages-count').text('').hide();
+        }
+    });
+}
 
+
+function markMessagesAsReadWhenAlreadyInChat(unique_id) {
+    $.ajax({
+        url: '/chat/mark_messages_as_read_for_ongoing_chat/', 
+        method: 'POST',
+        data: {
+            'unique_id': unique_id,
+            'csrfmiddlewaretoken': getCookie('csrftoken')
+        },
+        success: function(response) {
+            console.log('Messages marked as read');
+        },
+        error: function(error) {
+            console.error('Error marking messages as read:', error);
+        }
+    })
+}
 
 // scroll to the botttom when selected a user chat
 function scrollToBottomOfActiveChat(animate = true) {
@@ -165,7 +206,7 @@ function scrollToBottomOfActiveChat(animate = true) {
             } else {
                 activeMessageWrapper.scrollTop(activeMessageWrapper[0].scrollHeight); // instant scrolling without animation
             }
-        }, 1); // Delay of 100 milliseconds
+        }, 1); // Delay of 1 milliseconds
     }
 }
 

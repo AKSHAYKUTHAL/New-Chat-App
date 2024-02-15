@@ -415,3 +415,65 @@ html {
   10%, 90% { bottom: 20px; opacity: 1; }
   100% { bottom: -100px; opacity: 0; }
 }
+
+
+
+.d-flex.bd-highlight {
+  position: relative;
+}
+
+
+.unread-messages-count {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background-color: #16a429;
+  color: white;
+  border-radius: 50%;
+  padding: 15px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-width: 40px;
+  height: 40px;
+  font-size: 1em;
+  font-weight: bold;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  margin-top: 15px;
+}
+
+
+.unread-messages-count::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 12px;
+  height: 12px;
+  background-color: #00E676; 
+  border-radius: 50%;
+  border: 2px solid white; 
+}
+
+.unread-messages-count:hover {
+  transform: scale(1.1);
+  cursor: pointer;
+}
+
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.unread-messages-count {
+  animation: pulse 2s infinite; 
+}
+

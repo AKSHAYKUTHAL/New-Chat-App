@@ -2,10 +2,12 @@ from django.shortcuts import render
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
-from .models import Thread,Group
+from .models import Thread, Group, GroupMessage, ChatMessage
 from itertools import chain
 from django.db.models import Value, BooleanField
-from django.forms.models import model_to_dict
+from django.views.decorators.http import require_POST
+
+
 
 
 User = get_user_model()
@@ -100,3 +102,59 @@ def add_to_group(request):
 
     chat_url = '/chat/'
     return JsonResponse({'redirect_url': chat_url})
+
+
+
+
+
+@login_required
+def mark_messages_as_read(request):
+    unique_id = request.POST.get('unique_id')
+    user = request.user
+
+    thread = Thread.objects.filter(unique_id=unique_id).first()
+    if thread:
+        if user == thread.first_person or user == thread.second_person:
+            ChatMessage.objects.filter(thread=thread, is_read=False).update(is_read=True)
+            return JsonResponse({'status': 'success'})
+        else:
+            return JsonResponse({'error': 'User not part of the thread'}, status=403)
+
+
+    group = Group.objects.filter(unique_id=unique_id).first()
+    if group:
+        if group.members.filter(id=user.id).exists():
+            GroupMessage.objects.filter(group=group, is_read=False).update(is_read=True)
+            return JsonResponse({'status': 'success'})
+        else:
+            return JsonResponse({'error': 'User not part of the group'}, status=403)
+
+    return JsonResponse({'error': 'Thread or group not found'}, status=404)
+
+
+
+@login_required
+def mark_messages_as_read_for_ongoing_chat(request):
+    unique_id = request.POST.get('unique_id')
+    user = request.user
+
+    thread = Thread.objects.filter(unique_id=unique_id).first()
+    if thread:
+        if user == thread.first_person or user == thread.second_person:
+            ChatMessage.objects.filter(thread=thread, is_read=False).update(is_read=True)
+            return JsonResponse({'status': 'success'})
+        else:
+            return JsonResponse({'error': 'User not part of the thread'}, status=403)
+
+
+    group = Group.objects.filter(unique_id=unique_id).first()
+    if group:
+        if group.members.filter(id=user.id).exists():
+            GroupMessage.objects.filter(group=group, is_read=False).update(is_read=True)
+            return JsonResponse({'status': 'success'})
+        else:
+            return JsonResponse({'error': 'User not part of the group'}, status=403)
+
+    return JsonResponse({'error': 'Thread or group not found'}, status=404)
+
+

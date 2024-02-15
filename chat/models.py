@@ -37,7 +37,7 @@ class ChatMessage(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     message = models.TextField()
     timestamp = models.DateTimeField(auto_now_add=True)
-    delivery_status = models.BooleanField(default=False)    
+    is_read  = models.BooleanField(default=False)   
 
     
     def __str__(self):
@@ -65,6 +65,7 @@ class GroupMessage(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     message = models.TextField()
     timestamp = models.DateTimeField(auto_now_add=True)
+    is_read  = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.user} - {self.message[:50]}"

@@ -10,6 +10,10 @@ urlpatterns = [
     path('create_group/', views.create_group, name='create_group'),
     path('search_users_add_to_group/<uuid:group_unique_id>/', views.search_users_add_to_group, name='search_users_add_to_group'),
     path('add_to_group/',views.add_to_group,name='add_to_group'),
+    path('mark_messages_as_read/',views.mark_messages_as_read,name='mark_messages_as_read'),
+    path('mark_messages_as_read_for_ongoing_chat/',views.mark_messages_as_read_for_ongoing_chat,name='mark_messages_as_read_for_ongoing_chat'),
+    
+
 ]
 
 

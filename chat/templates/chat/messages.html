@@ -16,7 +16,7 @@
 </div>
 
 
-    {% if user.is_authenticated %}
+    {% if request.user.is_authenticated %}
         <h1 style="text-align: end; padding-right: 10px">Logged in as : {{ user.username }}</h1>
         <input type="hidden" id="logged-in-user" value="{{ user.id }}">
     {% endif %}
@@ -46,31 +46,33 @@
                     
 
                     
-					<div class="card-body contacts_body">
-						<ui class="contacts">
+                    <div class="card-body contacts_body">
+                        <ul class="contacts"> <!-- Changed <ui> to <ul> for valid HTML -->
                             {% for item in threads_and_groups %}
-							    <li onclick="setActiveChat(this)" class=" contact-li" chat-id="chat_{{ item.unique_id }}" data-thread-id="{{ item.unique_id }}" style="cursor: pointer">
-                                    <div class="d-flex bd-highlight">
-                                        <div class="img_cont"> 
-                                            <img src="https://static.turbosquid.com/Preview/001292/481/WV/_D.jpg" class="rounded-circle user_img">
-                                            <span class="online_icon"></span>
-                                        </div>
-                                        <div class="user_info">
-                                            {% if item.is_thread %}
-                                                {% if item.first_person == user %}
-                                                    <span>{{ item.second_person.username }}</span>
-                                                {% else %}
-                                                    <span>{{ item.first_person.username }}</span>
-                                                {% endif %}
-                                            {% elif item.is_group %}
-                                                <span>{{ item.name }}</span>
-                                            {% endif %}
-                                        </div>
+                            <li onclick="setActiveChat(this)" class="contact-li" chat-id="chat_{{ item.unique_id }}" data-thread-id="{{ item.unique_id }}" style="cursor: pointer;">
+                                <div class="d-flex bd-highlight">
+                                    <div class="img_cont"> 
+                                        <img src="https://static.turbosquid.com/Preview/001292/481/WV/_D.jpg" class="rounded-circle user_img">
+                                        <span class="online_icon"></span>
                                     </div>
-                                </li>
+                                    <div class="user_info">
+                                        {% if item.is_thread %}
+                                            {% if item.first_person == user %}
+                                                <span>{{ item.second_person.username }}</span>
+                                            {% else %}
+                                                <span>{{ item.first_person.username }}</span>
+                                            {% endif %}
+                                        {% elif item.is_group %}
+                                            <span>{{ item.name }}</span>
+                                        {% endif %}
+                                    </div>
+                                    <span class="unread-messages-count" style="display: none;"></span>
+                                </div>
+                            </li>
                             {% endfor %}
-						</ui>
-					</div>
+                        </ul>
+                    </div>
+                    
 					<div class="card-footer"></div>
 				</div>
             </div>

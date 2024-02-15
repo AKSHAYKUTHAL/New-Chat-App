@@ -4,8 +4,8 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
 from django.contrib.auth import get_user_model
 from .models import Thread,ChatMessage,Group,GroupMessage
-# from chat.models import Thread, ChatMessage
-from asgiref.sync import sync_to_async
+from django.db.models import Sum, Case, When, IntegerField
+
 
 
 User = get_user_model()
@@ -37,12 +37,9 @@ class ChatConsumer(AsyncConsumer):
             )
 
     async def websocket_receive(self, event):
-        # print('receive', event)
         received_data = json.loads(event['text'])
-        print(received_data)
         msg = received_data.get('message')
         sent_by_id = received_data.get('sent_by')
-        # thread_or_group_id = received_data.get('thread_or_group_id')
         unique_id = received_data.get('unique_id')
 
         if not msg:
@@ -77,7 +74,6 @@ class ChatConsumer(AsyncConsumer):
         response = {
             'message': msg,
             'sent_by': self_user.id,
-            # 'thread_or_group_id': thread_or_group_id,
             'unique_id': unique_id,
             'sent_by_username':sent_by_username,
             'timestamp': formatted_timestamp,
@@ -99,7 +95,6 @@ class ChatConsumer(AsyncConsumer):
 
 
     async def chat_message(self, event):
-        # print('chat_message', event)
         await self.send({
             'type': 'websocket.send',
             'text': event['text']
@@ -137,6 +132,9 @@ class ChatConsumer(AsyncConsumer):
     @database_sync_to_async
     def get_user_groups(self, user):
         return list(Group.objects.filter(members=user))
+    
+    # @database_sync_to_async
+    # def get_other
 
-    
-    
+
+
